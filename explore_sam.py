@@ -165,7 +165,8 @@ if __name__ == "__main__":
         if torch.is_tensor(masks_tensor) and len(masks_tensor.shape) == 4:
             fig, axes = plt.subplots(2, 4, figsize=(15, 8))
             fig.suptitle(
-                f"SAM Mask Decoder Output (8/{masks_tensor.shape[0]} masks)", fontsize=14
+                f"SAM Mask Decoder Output (8/{masks_tensor.shape[0]} masks)",
+                fontsize=14,
             )
 
             for idx in range(min(8, masks_tensor.shape[0])):
