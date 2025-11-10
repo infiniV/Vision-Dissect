@@ -1,9 +1,10 @@
 #!/usr/bin/env pwsh
 # Git Add, Commit with AI, and Push script
 
-# Check if GROQ_API_KEY is set
-if (-not $env:GROQ_API_KEY) {
-    Write-Host "Error: GROQ_API_KEY environment variable is not set" -ForegroundColor Red
+# Check if CEREBRAS_API_KEY is set
+if (-not $env:CEREBRAS_API_KEY) {
+    Write-Host "Error: CEREBRAS_API_KEY environment variable is not set" -ForegroundColor Red
+    Write-Host "Get your free API key at: https://cloud.cerebras.ai" -ForegroundColor Yellow
     exit 1
 }
 
@@ -13,55 +14,68 @@ git add -A
 
 # Get git status summary
 $gitStatus = git status --short
-$gitStats = git diff --cached --stat
+$gitDiff = git diff --cached --stat
 
 if ([string]::IsNullOrWhiteSpace($gitStatus)) {
     Write-Host "No changes to commit" -ForegroundColor Yellow
     exit 0
 }
 
-# Prepare the prompt for Groq with just the summary
-$prompt = "Generate a simple, concise git commit message (one line, max 10 words, no quotes or formatting) for these file changes:`n`n$gitStatus`n`nStats: $gitStats"
+# Count file types and changes
+$fileCount = ($gitStatus | Measure-Object).Count
+$statusLines = $gitStatus -split "`n" | Select-Object -First 10
+$statusSummary = if ($fileCount -gt 10) { 
+    "$($statusLines -join "`n")`n... and $($fileCount - 10) more files" 
+} else { 
+    $gitStatus 
+}
 
-# Create JSON payload
-$messages = @(
-    @{
-        role = "user"
-        content = $prompt
-    }
-) | ConvertTo-Json -Depth 10
+# Prepare the prompt - simplified to avoid huge payloads
+$userPrompt = "Generate a concise git commit message (max 72 chars) for these changes:`n`nFiles changed: $fileCount`n`n$statusSummary`n`nStats: $gitDiff`n`nReturn ONLY the commit message, no quotes."
 
-$body = @{
+# Create JSON payload using PowerShell objects
+$bodyObject = @{
+    model = "llama-3.3-70b"
     messages = @(
         @{
+            role = "system"
+            content = "You are a git commit message generator. Generate concise, conventional commit messages following best practices. Return only the commit message without quotes or formatting."
+        }
+        @{
             role = "user"
-            content = $prompt
+            content = $userPrompt
         }
     )
-    model = "moonshotai/kimi-k2-instruct-0905"
-    temperature = 0.6
     max_completion_tokens = 100
-    top_p = 1
+    temperature = 0.6
+    top_p = 0.95
     stream = $false
-} | ConvertTo-Json -Depth 10
+}
+
+$body = $bodyObject | ConvertTo-Json -Depth 10
 
 Write-Host "Generating commit message..." -ForegroundColor Cyan
 
 try {
-    # Call Groq API
-    $response = Invoke-RestMethod -Uri "https://api.groq.com/openai/v1/chat/completions" `
+    # Call Cerebras API
+    $response = Invoke-RestMethod -Uri "https://api.cerebras.ai/v1/chat/completions" `
         -Method Post `
         -Headers @{
             "Content-Type" = "application/json"
-            "Authorization" = "Bearer $env:GROQ_API_KEY"
+            "Authorization" = "Bearer $env:CEREBRAS_API_KEY"
         } `
         -Body $body
 
     # Extract commit message
     $commitMsg = $response.choices[0].message.content.Trim()
     
-    # Remove any markdown formatting or quotes
-    $commitMsg = $commitMsg -replace '^\*\*', '' -replace '\*\*$', '' -replace '^"', '' -replace '"$', '' -replace '^`', '' -replace '`$', ''
+    # Remove any markdown formatting, quotes, or extra whitespace
+    $commitMsg = $commitMsg -replace '^\*\*', '' -replace '\*\*$', '' -replace '^"', '' -replace '"$', '' -replace '^`', '' -replace '`$', '' -replace '^\s+|\s+$', ''
+    
+    # If message is too long, truncate intelligently
+    if ($commitMsg.Length -gt 72) {
+        $commitMsg = $commitMsg.Substring(0, 69) + "..."
+    }
     
     Write-Host "Commit message: $commitMsg" -ForegroundColor Green
     

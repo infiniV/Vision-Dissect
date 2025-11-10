@@ -124,6 +124,7 @@ def extract_intermediate_features(model, image_processor, image, device):
 def visualize_layer_features(activations, save_path="../viz/depthpro_features.png"):
     """Visualize features from different layers."""
     import os
+
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     num_features = len(activations)
     fig, axes = plt.subplots(2, (num_features + 1) // 2, figsize=(20, 8))
@@ -338,7 +339,7 @@ def main():
 
     # Load image
     print("\nLoading test image...")
-    image = Image.open("../test_data/test_image.jpg")
+    image = Image.open("test_data/test_image.jpg")
     print(f"  Image size: {image.size}")
 
     # Extract and visualize features
