@@ -364,8 +364,18 @@ def visualize_dpt_head_stages(model, image, device):
             ax.axis("off")
             continue
 
-        im = ax.imshow(img, cmap="plasma")
-        ax.set_title(name.replace("_", " ").title(), fontsize=10)
+        # Use Spectral_r colormap for final depth output to match official implementation
+        cmap_name = "Spectral_r" if name == "final_output" else "plasma"
+
+        # Normalize the image for better visualization
+        img_normalized = (
+            (img - img.min()) / (img.max() - img.min())
+            if img.max() > img.min()
+            else img
+        )
+
+        im = ax.imshow(img_normalized, cmap=cmap_name)
+        ax.set_title(name.replace("_", " ").title(), fontsize=10, weight="bold")
         ax.axis("off")
         plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
 
