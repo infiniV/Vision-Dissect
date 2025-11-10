@@ -15,3 +15,6 @@ wheels/
 
 # Vision benchmark large numpy files
 vision-bench/viz/**/*.npy
+
+# Documentation/prompt files
+docs/plan-unifiedVisionModelBenchmark.prompt.prompt.md
