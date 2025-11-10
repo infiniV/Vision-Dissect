@@ -12,3 +12,6 @@ wheels/
 # Model files
 *.pt
 *.onnx
+
+# Vision benchmark large numpy files
+vision-bench/viz/**/*.npy
