@@ -22,12 +22,24 @@ import numpy as np
 import torch
 from PIL import Image
 import matplotlib.pyplot as plt
+import math
 
 # Constants
 NUM_INFERENCE_RUNS = 5
 RANDOM_SEED = 42
 CLEANUP_SLEEP_SEC = 2
 TIMESTAMP_FORMAT = "%Y%m%d_%H%M%S"
+
+
+def safe_float(value):
+    """Convert a value to float, handling NaN/Inf by returning None."""
+    try:
+        f = float(value)
+        if math.isnan(f) or math.isinf(f):
+            return None
+        return f
+    except (ValueError, TypeError):
+        return None
 
 
 def format_bytes(bytes_val: int) -> str:
@@ -223,11 +235,11 @@ class DepthProBenchmark(ModelBenchmark):
                     "type": type(layer_module).__name__,
                     "shape": list(tensor.shape),
                     "dtype": str(tensor.dtype),
-                    "min": float(tensor.min()),
-                    "max": float(tensor.max()),
-                    "mean": float(tensor.mean()),
-                    "std": float(tensor.std()),
-                    "sparsity": float((tensor == 0).float().mean()),
+                    "min": safe_float(tensor.min()),
+                    "max": safe_float(tensor.max()),
+                    "mean": safe_float(tensor.mean()),
+                    "std": safe_float(tensor.std()),
+                    "sparsity": safe_float((tensor == 0).float().mean()),
                 }
                 layers_metadata.append(layer_info)
 
@@ -394,11 +406,11 @@ class DepthAnythingV2SmallBenchmark(ModelBenchmark):
                     "type": type(layer_module).__name__,
                     "shape": list(tensor.shape),
                     "dtype": str(tensor.dtype),
-                    "min": float(tensor.min()),
-                    "max": float(tensor.max()),
-                    "mean": float(tensor.mean()),
-                    "std": float(tensor.std()),
-                    "sparsity": float((tensor == 0).float().mean()),
+                    "min": safe_float(tensor.min()),
+                    "max": safe_float(tensor.max()),
+                    "mean": safe_float(tensor.mean()),
+                    "std": safe_float(tensor.std()),
+                    "sparsity": safe_float((tensor == 0).float().mean()),
                 }
                 layers_metadata.append(layer_info)
 
@@ -554,11 +566,11 @@ class YOLO11nDetectBenchmark(ModelBenchmark):
                     "type": type(layer_module).__name__,
                     "shape": list(tensor.shape),
                     "dtype": str(tensor.dtype),
-                    "min": float(tensor.min()),
-                    "max": float(tensor.max()),
-                    "mean": float(tensor.mean()),
-                    "std": float(tensor.std()),
-                    "sparsity": float((tensor == 0).float().mean()),
+                    "min": safe_float(tensor.min()),
+                    "max": safe_float(tensor.max()),
+                    "mean": safe_float(tensor.mean()),
+                    "std": safe_float(tensor.std()),
+                    "sparsity": safe_float((tensor == 0).float().mean()),
                 }
                 layers_metadata.append(layer_info)
 
@@ -708,11 +720,11 @@ class MobileSAMBenchmark(ModelBenchmark):
                     "type": type(layer_module).__name__,
                     "shape": list(tensor.shape),
                     "dtype": str(tensor.dtype),
-                    "min": float(tensor.min()),
-                    "max": float(tensor.max()),
-                    "mean": float(tensor.mean()),
-                    "std": float(tensor.std()),
-                    "sparsity": float((tensor == 0).float().mean()),
+                    "min": safe_float(tensor.min()),
+                    "max": safe_float(tensor.max()),
+                    "mean": safe_float(tensor.mean()),
+                    "std": safe_float(tensor.std()),
+                    "sparsity": safe_float((tensor == 0).float().mean()),
                 }
                 layers_metadata.append(layer_info)
 
