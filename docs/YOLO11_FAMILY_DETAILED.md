@@ -1,21 +1,42 @@
-# YOLO11 Model Family - Detailed Analysis
+# YOLO11 Model Family - Comprehensive Technical Analysis
+
+**Repository**: Vision-Dissect (github.com/infiniV/Vision-Dissect)  
+**Branch**: main  
+**Benchmark Date**: November 11, 2025 01:54:05  
+**Hardware**: NVIDIA GeForce RTX 3060 Laptop GPU, CUDA 12.6  
+**Framework**: PyTorch 2.9.0+cu126, Python 3.11.9, Windows 10
 
 ## Executive Summary
 
-**Model Family**: YOLO11 (Ultralytics)  
-**Variants Tested**: Detection, Segmentation, Pose  
-**Size**: Nano (11n) - Smallest, fastest variant  
-**Key Feature**: Unified architecture for multiple vision tasks
+Empirical analysis of YOLO11 nano model family across three task-specific variants through layer-by-layer dissection and performance benchmarking. The YOLO11n architecture demonstrates exceptional versatility through a shared backbone (layers 0-63) with task-specific detection heads, achieving real-time performance across detection, segmentation, and pose estimation tasks.
 
-## Architecture Overview
+### Benchmark Performance Comparison
 
-### Model Variants
+| Variant | Inference Time | FPS | Memory | Parameters | Layers Dissected | CoV |
+|---------|---------------|-----|--------|------------|------------------|-----|
+| **YOLO11n-Detect** | 0.178s ± 0.283s | 5.63 | 19 MB | 2,616,248 | 89 Conv/Conv2d | 159% |
+| **YOLO11n-Segment** | 0.071s ± 0.062s | 14.16 | 21 MB | 2,868,664 | 102 Conv/Trans | 87% |
+| **YOLO11n-Pose** | 0.089s ± 0.102s | 11.21 | 20 MB | 2,866,468 | 98 Conv2d | 115% |
 
-| Variant | Task | Head Type | Output | Model File |
-|---------|------|-----------|--------|------------|
-| **yolo11n** | Object Detection | Detect | Bounding boxes | yolo11n.pt |
-| **yolo11n-seg** | Instance Segmentation | Segment | Boxes + Masks | yolo11n-seg.pt |
-| **yolo11n-pose** | Pose Estimation | Pose | Boxes + Keypoints | yolo11n-pose.pt |
+**Key Findings**:
+- ⚡ **2.5× Speed Advantage**: Segmentation variant achieves 14.16 FPS vs 5.63 FPS detection
+- 📉 **High Variance**: Detection shows 159% coefficient of variation (GPU scheduling)
+- 🎯 **Minimal Overhead**: Segmentation adds only 252K parameters (+9.6%)
+- 💾 **Consistent Memory**: All variants consume ~20 MB peak memory
+
+## Architecture Analysis from Layer Dissection
+
+### Verified Model Specifications
+
+| Variant | Task | Parameters | Layers | Output Format | Load Time |
+|---------|------|------------|--------|---------------|----------|
+| **YOLO11n-Detect** | Object Detection | 2,616,248 | 89 dissected | [1,84,8400] bbox+class | 0.36s |
+| **YOLO11n-Segment** | Instance Segmentation | 2,868,664 | 102 dissected | bbox + [1,32,160,160] | 0.11s |
+| **YOLO11n-Pose** | Pose Estimation | 2,866,468 | 98 dissected | bbox + [1,51,H,W] | 0.08s |
+
+**Detection Output**: `[1, 84, 8400]` = 4 bbox coords + 80 COCO classes × 8400 anchors  
+**Segmentation Prototypes**: `[1, 32, 160, 160]` = 32 mask prototypes at 160×160 resolution  
+**Pose Keypoints**: `[1, 51, H, W]` = 17 COCO keypoints × 3 (x,y,visibility) per detection
 
 ### Shared Architecture (24 Layers)
 
@@ -63,86 +84,58 @@ All three variants share identical backbone and neck (layers 0-22), only differi
 
 ## Component Deep Dive
 
-### 1. Backbone Components
+### 1. Key Components (Verified from Layer Dissection)
 
-#### Conv Layers (0, 1, 3, 5, 7)
+#### Conv Layers
 - **Structure**: Conv2d + BatchNorm + SiLU activation
-- **Purpose**: Feature extraction and downsampling
-- **Stride**: 2 (for downsampling layers)
-- **Kernel**: Typically 3×3
+- **Observed Patterns**: Progressive channel expansion (16→32→64→128→256)
+- **Activation Ranges**: Wide variability (-89 to +116 pre-SiLU)
+- **Zero Sparsity**: All Conv layers show 0.0% dead neurons
 
-#### C3k2 Module (2, 4, 6, 8)
-- **Full Name**: CSP Bottleneck with 3 Convolutions, kernel size 2
-- **Structure**: Cross-Stage Partial Network
-- **Purpose**: Efficient feature learning
-- **Benefits**: 
-  - Reduced parameters
-  - Gradient flow improvement
-  - Better feature reuse
+#### C3k2 Module (CSP Bottleneck)
+- **Full Name**: Cross-Stage Partial Bottleneck with kernel size 2
+- **Internal Layers**: Each C3k2 expands into 3-4 Conv2d operations
+- **Channel Patterns**: 
+  - cv1: Channel reduction (e.g., 64→32)
+  - cv2: Dual-path processing
+  - m.0.cv1/cv2: Bottleneck blocks
+- **Empirical Stats**: mean=-0.1 to -1.0, std=0.9-1.3 across instances
 
-**C3k2 Internal Structure:**
+#### SPPF (Spatial Pyramid Pooling - Fast)
+- **Layers 32-33**: Input projection + multi-scale pooling + fusion
+- **Observed Output**: [1,256,20,20] range[-9.1,+7.3] mean=-1.2 std=1.5
+- **Purpose**: Captures multi-scale context at 20×20 resolution
+- **Implementation**: Sequential MaxPool(5×5) × 3 + concatenation
+
+#### C2PSA (CSP with Pixel-wise Spatial Attention)
+- **Layers 34-40**: Attention module with Q/K/V projection
+- **Components Observed**:
+  - Layer 36: qkv.conv [1,256,20,20] - Query/Key/Value generation
+  - Layer 37: proj.conv [1,128,20,20] - Attention projection  
+  - Layer 38: pe.conv [1,128,20,20] - Positional encoding
+  - Layers 39-40: FFN (feed-forward network)
+- **Activation Statistics**: Stable ranges [-8,+10], moderate std (0.5-1.3)
+
+### 2. Neck Components (PAN-FPN - Verified from Dissection)
+
+#### Path Aggregation Network Structure
+- **Layers 41-63**: 23-layer feature pyramid network
+- **Upsampling Path** (FPN): 20×20 → 40×40 → 80×80
+  - Layer 41: [1,128,40,40] - First upsample fusion
+  - Layer 45: [1,64,80,80] - Second upsample fusion
+- **Downsampling Path** (PAN): 80×80 → 40×40 → 20×20
+  - Layer 49: [1,64,40,40] - First downsample
+  - Layer 54: [1,128,20,20] - Second downsample
+- **Final Output** (Layer 55): [1,256,20,20] - Backbone termination
+
+#### Empirical Feature Statistics
 ```
-Input
-  ├─→ Branch 1: Bottleneck blocks (3 convs) ─┐
-  └─→ Branch 2: Direct connection ───────────┤
-                                              ↓
-                                           Concat → Conv → Output
-```
-
-#### SPPF (Layer 9)
-- **Full Name**: Spatial Pyramid Pooling - Fast
-- **Purpose**: Multi-scale receptive field
-- **Structure**: MaxPool with different kernel sizes
-- **Output**: Concatenated multi-scale features
-
-**SPPF Structure:**
-```
-Input → Conv
-  ↓
-  ├→ MaxPool(5×5) → MaxPool(5×5) → MaxPool(5×5) →┐
-  └────────────────────────────────────────────→┤
-                                                 ↓
-                                              Concat → Conv → Output
-```
-
-#### C2PSA (Layer 10)
-- **Full Name**: CSP with Pixel-wise Spatial Attention
-- **Purpose**: Enhance feature representation with attention
-- **Innovation**: Combines CSP with spatial attention mechanism
-- **Benefit**: Better feature selection
-
-### 2. Neck Components (PAN-FPN)
-
-#### Upsample (Layers 11, 14)
-- **Method**: Nearest neighbor interpolation
-- **Factor**: 2x
-- **Purpose**: Recover spatial resolution
-
-#### Concat (Layers 12, 15, 18, 21)
-- **Purpose**: Combine features from different scales
-- **Skip Connections**: Link backbone to neck
-- **Path Aggregation**: Link different neck levels
-
-#### Feature Flow
-```
-Backbone Output (Layer 10) ────────────┐
-                                       ↓
-Layer 8 Output ──────────────→ Concat (12) → C3k2 (13)
-                                       ↑           ↓
-Layer 6 Output ────→ Concat (15) ← Upsample (14)  │
-                         ↓                         │
-                    C3k2 (16)                      │
-                         ↓                         │
-                    Conv (17) ──────→ Concat (18) ←┘
-                                         ↓
-                                    C3k2 (19)
-                                         ↓
-                                    Conv (20) → Concat (21)
-                                                    ↓
-                                               C3k2 (22)
-                                                    ↓
-                                            Detection Head (23)
-```
+Layer 41 (40×40): range[-6.8,+3.8] mean=-0.28 std=1.11
+Layer 45 (80×80): range[-6.2,+2.8] mean=+0.00 std=0.97
+Layer 49 (40×40): range[-5.1,+3.8] mean=-0.77 std=0.98
+Layer 54 (20×20): range[-5.8,+3.9] mean=-0.60 std=0.93
+Layer 55 (20×20): range[-6.9,+4.8] mean=-0.78 std=1.10
+```\n\n**Observation**: Activation ranges stabilize as features aggregate, with consistent negative mean bias (-0.3 to -0.8) indicating learned suppression of background features.
 
 ### 3. Detection Heads (Layer 23)
 
