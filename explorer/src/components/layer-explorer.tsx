@@ -42,19 +42,25 @@ export function LayerExplorer() {
       console.log("[Layer Explorer] Fetching models from /api/models");
       const response = await fetch("/api/models");
       console.log("[Layer Explorer] Models response status:", response.status);
-      
+
       if (!response.ok) {
-        console.error("[Layer Explorer] Models fetch failed with status:", response.status);
+        console.error(
+          "[Layer Explorer] Models fetch failed with status:",
+          response.status
+        );
         setLoading(false);
         return;
       }
-      
+
       const data = await response.json();
       console.log("[Layer Explorer] Received models:", data.models);
       setModels(data.models || []);
-      
+
       if (data.models && data.models.length > 0) {
-        console.log("[Layer Explorer] Auto-selecting first model:", data.models[0]);
+        console.log(
+          "[Layer Explorer] Auto-selecting first model:",
+          data.models[0]
+        );
         setSelectedModel(data.models[0]);
       } else {
         console.warn("[Layer Explorer] No models found in response");
@@ -70,31 +76,40 @@ export function LayerExplorer() {
     try {
       console.log(`[Layer Explorer] Fetching layer data for model: ${model}`);
       const response = await fetch(`/api/layers/${model}`);
-      console.log("[Layer Explorer] Layer data response status:", response.status);
-      
+      console.log(
+        "[Layer Explorer] Layer data response status:",
+        response.status
+      );
+
       if (!response.ok) {
-        console.error("[Layer Explorer] Layer data fetch failed with status:", response.status);
+        console.error(
+          "[Layer Explorer] Layer data fetch failed with status:",
+          response.status
+        );
         return;
       }
-      
+
       const data = await response.json();
       console.log(`[Layer Explorer] Received layer data for ${model}:`, {
         layersCount: data.layers?.length || 0,
-        visualizationsCount: data.visualizations?.length || 0
+        visualizationsCount: data.visualizations?.length || 0,
       });
-      
+
       if (data.layers && data.layers.length > 0) {
         console.log("[Layer Explorer] First layer:", data.layers[0]);
       } else {
         console.warn("[Layer Explorer] No layers found in response");
       }
-      
+
       if (data.visualizations && data.visualizations.length > 0) {
-        console.log("[Layer Explorer] First visualization path:", data.visualizations[0]);
+        console.log(
+          "[Layer Explorer] First visualization path:",
+          data.visualizations[0]
+        );
       } else {
         console.warn("[Layer Explorer] No visualizations found in response");
       }
-      
+
       setLayerData(data);
       if (data.layers && data.layers.length > 0) {
         console.log("[Layer Explorer] Auto-selecting first layer");
@@ -199,13 +214,17 @@ export function LayerExplorer() {
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Min</span>
                         <span className="font-mono">
-                          {currentLayer.min !== null ? currentLayer.min.toFixed(4) : 'N/A'}
+                          {currentLayer.min !== null
+                            ? currentLayer.min.toFixed(4)
+                            : "N/A"}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Max</span>
                         <span className="font-mono">
-                          {currentLayer.max !== null ? currentLayer.max.toFixed(4) : 'N/A'}
+                          {currentLayer.max !== null
+                            ? currentLayer.max.toFixed(4)
+                            : "N/A"}
                         </span>
                       </div>
                     </div>
@@ -213,19 +232,25 @@ export function LayerExplorer() {
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Mean</span>
                         <span className="font-mono">
-                          {currentLayer.mean !== null ? currentLayer.mean.toFixed(4) : 'N/A'}
+                          {currentLayer.mean !== null
+                            ? currentLayer.mean.toFixed(4)
+                            : "N/A"}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Std Dev</span>
                         <span className="font-mono">
-                          {currentLayer.std !== null ? currentLayer.std.toFixed(4) : 'N/A'}
+                          {currentLayer.std !== null
+                            ? currentLayer.std.toFixed(4)
+                            : "N/A"}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Sparsity</span>
                         <span className="font-mono">
-                          {currentLayer.sparsity !== null ? (currentLayer.sparsity * 100).toFixed(2) + '%' : 'N/A'}
+                          {currentLayer.sparsity !== null
+                            ? (currentLayer.sparsity * 100).toFixed(2) + "%"
+                            : "N/A"}
                         </span>
                       </div>
                     </div>

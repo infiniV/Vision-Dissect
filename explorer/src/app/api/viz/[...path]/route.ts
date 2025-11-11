@@ -23,22 +23,25 @@ export async function GET(
 
     if (!fs.existsSync(filePath)) {
       console.warn(`[Viz API] File not found: ${filePath}`);
-      
+
       // Try to list parent directory to help debug
       const parentDir = path.dirname(filePath);
       if (fs.existsSync(parentDir)) {
         const parentFiles = fs.readdirSync(parentDir);
-        console.log(`[Viz API] Files in parent directory (${parentDir}):`, parentFiles);
+        console.log(
+          `[Viz API] Files in parent directory (${parentDir}):`,
+          parentFiles
+        );
       } else {
         console.warn(`[Viz API] Parent directory does not exist: ${parentDir}`);
       }
-      
+
       return new NextResponse("Not found", { status: 404 });
     }
 
     const stats = fs.statSync(filePath);
     console.log(`[Viz API] File size: ${stats.size} bytes`);
-    
+
     const file = fs.readFileSync(filePath);
     const ext = path.extname(filePath).toLowerCase();
     console.log(`[Viz API] File extension: ${ext}`);
@@ -52,7 +55,7 @@ export async function GET(
     const contentType = contentTypes[ext] || "application/octet-stream";
     console.log(`[Viz API] Content-Type: ${contentType}`);
     console.log(`[Viz API] Successfully serving file`);
-    
+
     return new NextResponse(file, {
       headers: {
         "Content-Type": contentType,
@@ -60,7 +63,10 @@ export async function GET(
     });
   } catch (error) {
     console.error("[Viz API] Error serving file:", error);
-    console.error("[Viz API] Error stack:", error instanceof Error ? error.stack : 'N/A');
+    console.error(
+      "[Viz API] Error stack:",
+      error instanceof Error ? error.stack : "N/A"
+    );
     console.error("[Viz API] Request path:", params.path);
     return new NextResponse("Error", { status: 500 });
   }

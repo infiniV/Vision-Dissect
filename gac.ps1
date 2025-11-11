@@ -31,7 +31,7 @@ $statusSummary = if ($fileCount -gt 10) {
 }
 
 # Prepare the prompt - simplified to avoid huge payloads
-$userPrompt = "Generate a concise git commit message (max 72 chars) for these changes:`n`nFiles changed: $fileCount`n`n$statusSummary`n`nStats: $gitDiff`n`nReturn ONLY the commit message, no quotes."
+$userPrompt = "Generate a proper git commit message for these changes:`n`nFiles changed: $fileCount`n`n$statusSummary`n`nStats: $gitDiff`n`nFormat:`n- First line: concise summary (max 72 chars)`n- Blank line`n- Body: bullet points explaining what changed and why (2-4 lines)`n`nReturn ONLY the commit message, no quotes or markdown."
 
 # Create JSON payload using PowerShell objects
 $bodyObject = @{
@@ -39,14 +39,14 @@ $bodyObject = @{
     messages = @(
         @{
             role = "system"
-            content = "You are a git commit message generator. Generate concise, conventional commit messages following best practices. Return only the commit message without quotes or formatting."
+            content = "You are a git commit message generator. Generate proper multi-line conventional commit messages with a summary line followed by a blank line and a detailed body. Return only the commit message without quotes, markdown, or formatting."
         }
         @{
             role = "user"
             content = $userPrompt
         }
     )
-    max_completion_tokens = 100
+    max_completion_tokens = 250
     temperature = 0.6
     top_p = 0.95
     stream = $false
@@ -69,15 +69,16 @@ try {
     # Extract commit message
     $commitMsg = $response.choices[0].message.content.Trim()
     
-    # Remove any markdown formatting, quotes, or extra whitespace
-    $commitMsg = $commitMsg -replace '^\*\*', '' -replace '\*\*$', '' -replace '^"', '' -replace '"$', '' -replace '^`', '' -replace '`$', '' -replace '^\s+|\s+$', ''
+    # Remove any markdown formatting or quotes
+    $commitMsg = $commitMsg -replace '^\*\*', '' -replace '\*\*$', '' -replace '^"', '' -replace '"$', '' -replace '^```', '' -replace '```$', ''
     
-    # If message is too long, truncate intelligently
-    if ($commitMsg.Length -gt 72) {
-        $commitMsg = $commitMsg.Substring(0, 69) + "..."
-    }
+    # Clean up any leading/trailing whitespace while preserving internal structure
+    $commitMsg = $commitMsg.Trim()
     
-    Write-Host "Commit message: $commitMsg" -ForegroundColor Green
+    Write-Host "`nGenerated commit message:" -ForegroundColor Green
+    Write-Host "----------------------------------------" -ForegroundColor Gray
+    Write-Host $commitMsg -ForegroundColor Cyan
+    Write-Host "----------------------------------------" -ForegroundColor Gray
     
     # Commit with the generated message
     git commit -m $commitMsg

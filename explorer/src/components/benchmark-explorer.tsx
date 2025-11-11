@@ -45,31 +45,48 @@ export function BenchmarkExplorer() {
 
   const loadBenchmarkRuns = async () => {
     try {
-      console.log("[Benchmark Explorer] Fetching benchmark runs from /api/benchmarks");
+      console.log(
+        "[Benchmark Explorer] Fetching benchmark runs from /api/benchmarks"
+      );
       const response = await fetch("/api/benchmarks");
-      console.log("[Benchmark Explorer] Runs response status:", response.status);
-      
+      console.log(
+        "[Benchmark Explorer] Runs response status:",
+        response.status
+      );
+
       if (!response.ok) {
-        console.error("[Benchmark Explorer] Runs fetch failed with status:", response.status);
+        console.error(
+          "[Benchmark Explorer] Runs fetch failed with status:",
+          response.status
+        );
         setLoading(false);
         return;
       }
-      
+
       const data = await response.json();
-      console.log("[Benchmark Explorer] Received runs:", data.runs?.map((r: BenchmarkRun) => ({
-        timestamp: r.timestamp,
-        modelCount: r.models.length
-      })));
-      
+      console.log(
+        "[Benchmark Explorer] Received runs:",
+        data.runs?.map((r: BenchmarkRun) => ({
+          timestamp: r.timestamp,
+          modelCount: r.models.length,
+        }))
+      );
+
       setBenchmarkRuns(data.runs || []);
       if (data.runs && data.runs.length > 0) {
-        console.log("[Benchmark Explorer] Auto-selecting first run:", data.runs[0].timestamp);
+        console.log(
+          "[Benchmark Explorer] Auto-selecting first run:",
+          data.runs[0].timestamp
+        );
         setSelectedRun(data.runs[0].timestamp);
       } else {
         console.warn("[Benchmark Explorer] No runs found in response");
       }
     } catch (error) {
-      console.error("[Benchmark Explorer] Error loading benchmark runs:", error);
+      console.error(
+        "[Benchmark Explorer] Error loading benchmark runs:",
+        error
+      );
     } finally {
       setLoading(false);
     }
@@ -77,25 +94,40 @@ export function BenchmarkExplorer() {
 
   const loadMetrics = async (timestamp: string) => {
     try {
-      console.log(`[Benchmark Explorer] Fetching metrics for timestamp: ${timestamp}`);
+      console.log(
+        `[Benchmark Explorer] Fetching metrics for timestamp: ${timestamp}`
+      );
       const response = await fetch(`/api/benchmarks/${timestamp}`);
-      console.log("[Benchmark Explorer] Metrics response status:", response.status);
-      
+      console.log(
+        "[Benchmark Explorer] Metrics response status:",
+        response.status
+      );
+
       if (!response.ok) {
-        console.error("[Benchmark Explorer] Metrics fetch failed with status:", response.status);
+        console.error(
+          "[Benchmark Explorer] Metrics fetch failed with status:",
+          response.status
+        );
         return;
       }
-      
+
       const data = await response.json();
-      console.log(`[Benchmark Explorer] Received metrics count: ${data.metrics?.length || 0}`);
-      
+      console.log(
+        `[Benchmark Explorer] Received metrics count: ${
+          data.metrics?.length || 0
+        }`
+      );
+
       if (data.metrics && data.metrics.length > 0) {
         console.log("[Benchmark Explorer] First metric:", data.metrics[0]);
-        console.log("[Benchmark Explorer] All model names:", data.metrics.map((m: ModelMetrics) => m.model));
+        console.log(
+          "[Benchmark Explorer] All model names:",
+          data.metrics.map((m: ModelMetrics) => m.model)
+        );
       } else {
         console.warn("[Benchmark Explorer] No metrics found in response");
       }
-      
+
       setMetrics(data.metrics || []);
     } catch (error) {
       console.error("[Benchmark Explorer] Error loading metrics:", error);

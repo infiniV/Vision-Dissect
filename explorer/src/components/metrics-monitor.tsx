@@ -32,19 +32,22 @@ export function MetricsMonitor() {
       console.log("[Metrics Monitor] Fetching status from /api/status");
       const response = await fetch("/api/status");
       console.log("[Metrics Monitor] Status response status:", response.status);
-      
+
       if (!response.ok) {
-        console.error("[Metrics Monitor] Status fetch failed with status:", response.status);
+        console.error(
+          "[Metrics Monitor] Status fetch failed with status:",
+          response.status
+        );
         return;
       }
-      
+
       const data = await response.json();
       console.log("[Metrics Monitor] Received status data:", {
         running: data.running,
         currentModel: data.currentModel,
         progress: data.progress,
         totalModels: data.totalModels,
-        logsCount: data.logs?.length || 0
+        logsCount: data.logs?.length || 0,
       });
       setStatus(data);
     } catch (error) {
