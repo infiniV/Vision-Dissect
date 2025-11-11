@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 
 interface BenchmarkRun {
   timestamp: string;
@@ -32,6 +33,7 @@ export function BenchmarkExplorer() {
   const [selectedRun, setSelectedRun] = useState<string | null>(null);
   const [metrics, setMetrics] = useState<ModelMetrics[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMetrics, setLoadingMetrics] = useState(false);
 
   useEffect(() => {
     loadBenchmarkRuns();
@@ -93,6 +95,7 @@ export function BenchmarkExplorer() {
   };
 
   const loadMetrics = async (timestamp: string) => {
+    setLoadingMetrics(true);
     try {
       console.log(
         `[Benchmark Explorer] Fetching metrics for timestamp: ${timestamp}`
@@ -131,12 +134,15 @@ export function BenchmarkExplorer() {
       setMetrics(data.metrics || []);
     } catch (error) {
       console.error("[Benchmark Explorer] Error loading metrics:", error);
+    } finally {
+      setLoadingMetrics(false);
     }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <Spinner size="lg" />
         <p className="text-muted-foreground">Loading benchmarks...</p>
       </div>
     );
@@ -182,7 +188,14 @@ export function BenchmarkExplorer() {
           </div>
           <ScrollArea className="h-[600px]">
             <div className="p-4">
-              {metrics.length === 0 ? (
+              {loadingMetrics ? (
+                <div className="flex flex-col items-center justify-center py-16 space-y-4">
+                  <Spinner size="lg" />
+                  <p className="text-sm text-muted-foreground">
+                    Loading metrics...
+                  </p>
+                </div>
+              ) : metrics.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">
                   No metrics available
                 </p>

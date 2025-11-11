@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BenchmarkExplorer } from "@/components/benchmark-explorer";
 import { LayerExplorer } from "@/components/layer-explorer";
+import { LayerGraphView } from "@/components/layer-graph-view";
 import { MetricsMonitor } from "@/components/metrics-monitor";
 
 export default function Home() {
@@ -24,9 +25,10 @@ export default function Home() {
 
       <div className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-secondary">
+          <TabsList className="grid w-full grid-cols-4 bg-secondary">
             <TabsTrigger value="benchmarks">Benchmarks</TabsTrigger>
             <TabsTrigger value="layers">Layer Visualizations</TabsTrigger>
+            <TabsTrigger value="graph">Graph View</TabsTrigger>
             <TabsTrigger value="monitor">Live Monitor</TabsTrigger>
           </TabsList>
 
@@ -36,6 +38,10 @@ export default function Home() {
 
           <TabsContent value="layers" className="mt-6">
             <LayerExplorer />
+          </TabsContent>
+
+          <TabsContent value="graph" className="mt-6">
+            <LayerGraphView />
           </TabsContent>
 
           <TabsContent value="monitor" className="mt-6">

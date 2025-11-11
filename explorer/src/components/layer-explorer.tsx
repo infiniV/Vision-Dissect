@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import Image from "next/image";
+import { Spinner } from "@/components/ui/spinner";
 
 interface LayerData {
   model: string;
@@ -26,6 +26,8 @@ export function LayerExplorer() {
   const [layerData, setLayerData] = useState<LayerData | null>(null);
   const [selectedLayer, setSelectedLayer] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingLayers, setLoadingLayers] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
 
   useEffect(() => {
     loadModels();
@@ -73,6 +75,7 @@ export function LayerExplorer() {
   };
 
   const loadLayerData = async (model: string) => {
+    setLoadingLayers(true);
     try {
       console.log(`[Layer Explorer] Fetching layer data for model: ${model}`);
       const response = await fetch(`/api/layers/${model}`);
@@ -117,12 +120,15 @@ export function LayerExplorer() {
       }
     } catch (error) {
       console.error("[Layer Explorer] Error loading layer data:", error);
+    } finally {
+      setLoadingLayers(false);
     }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <Spinner size="lg" />
         <p className="text-muted-foreground">Loading models...</p>
       </div>
     );
@@ -169,22 +175,34 @@ export function LayerExplorer() {
         </div>
         <ScrollArea className="h-[600px]">
           <div className="p-2">
-            {layerData?.layers.map((layer, idx) => (
-              <button
-                key={idx}
-                onClick={() => setSelectedLayer(idx)}
-                className={`w-full text-left p-2 rounded border mb-2 text-sm transition-colors ${
-                  selectedLayer === idx
-                    ? "bg-secondary border-primary"
-                    : "border-border hover:border-primary"
-                }`}
-              >
-                <div className="font-medium">{layer.name}</div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  {layer.type} | {layer.shape.join("x")}
-                </div>
-              </button>
-            ))}
+            {loadingLayers ? (
+              <div className="flex flex-col items-center justify-center py-16 space-y-4">
+                <Spinner />
+                <p className="text-xs text-muted-foreground">
+                  Loading layers...
+                </p>
+              </div>
+            ) : (
+              layerData?.layers.map((layer, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setSelectedLayer(idx);
+                    setImageLoading(true);
+                  }}
+                  className={`w-full text-left p-2 rounded border mb-2 text-sm transition-colors ${
+                    selectedLayer === idx
+                      ? "bg-secondary border-primary"
+                      : "border-border hover:border-primary"
+                  }`}
+                >
+                  <div className="font-medium">{layer.name}</div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {layer.type} | {layer.shape.join("x")}
+                  </div>
+                </button>
+              ))
+            )}
           </div>
         </ScrollArea>
       </div>
@@ -261,13 +279,25 @@ export function LayerExplorer() {
                   <h4 className="font-semibold mb-3">Visualization</h4>
                   {selectedLayer !== null &&
                   layerData?.visualizations[selectedLayer] ? (
-                    <div className="border rounded p-2">
-                      <Image
-                        src={`/api/viz${layerData.visualizations[selectedLayer]}`}
+                    <div className="border rounded p-2 relative">
+                      {imageLoading && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-background/80 z-10 rounded">
+                          <Spinner size="lg" />
+                        </div>
+                      )}
+                      <img
+                        src={
+                          layerData.visualizations[selectedLayer].startsWith(
+                            "https://"
+                          )
+                            ? layerData.visualizations[selectedLayer]
+                            : `/api/viz${layerData.visualizations[selectedLayer]}`
+                        }
                         alt={`Layer ${selectedLayer} visualization`}
-                        width={800}
-                        height={600}
                         className="w-full h-auto"
+                        onLoadStart={() => setImageLoading(true)}
+                        onLoad={() => setImageLoading(false)}
+                        onError={() => setImageLoading(false)}
                       />
                     </div>
                   ) : (

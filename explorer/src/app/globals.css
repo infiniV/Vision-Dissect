@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* React Flow Styles */
+@import "@xyflow/react/dist/style.css";
+
 @layer base {
   :root {
     --background: 0 0% 100%;
