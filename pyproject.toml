@@ -7,6 +7,7 @@ requires-python = ">=3.11"
 dependencies = [
     "accelerate>=1.11.0",
     "fastapi>=0.115.0",
+    "hf-xet>=1.2.0",
     "matplotlib>=3.10.7",
     "onnx>=1.19.1",
     "onnxruntime>=1.23.2",
