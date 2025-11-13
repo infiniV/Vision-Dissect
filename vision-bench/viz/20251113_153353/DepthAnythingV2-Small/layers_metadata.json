@@ -1,0 +1,565 @@
+{
+  "layers": [
+    {
+      "idx": 0,
+      "name": "pretrained.patch_embed.proj",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        384,
+        37,
+        37
+      ],
+      "dtype": "torch.float32",
+      "min": -3.971160888671875,
+      "max": 3.667485475540161,
+      "mean": -0.007301208097487688,
+      "std": 0.740507185459137,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 1,
+      "name": "depth_head.projects.0",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        48,
+        37,
+        37
+      ],
+      "dtype": "torch.float32",
+      "min": -2.3678345680236816,
+      "max": 2.7563796043395996,
+      "mean": -0.06009562313556671,
+      "std": 0.6576000452041626,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 2,
+      "name": "depth_head.projects.1",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        96,
+        37,
+        37
+      ],
+      "dtype": "torch.float32",
+      "min": -2.4662137031555176,
+      "max": 2.000333309173584,
+      "mean": 0.02938259020447731,
+      "std": 0.5686047673225403,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 3,
+      "name": "depth_head.projects.2",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        192,
+        37,
+        37
+      ],
+      "dtype": "torch.float32",
+      "min": -2.5757462978363037,
+      "max": 2.573662519454956,
+      "mean": -0.006872367579489946,
+      "std": 0.6185418963432312,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 4,
+      "name": "depth_head.projects.3",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        384,
+        37,
+        37
+      ],
+      "dtype": "torch.float32",
+      "min": -2.5553975105285645,
+      "max": 2.3625617027282715,
+      "mean": -0.018266573548316956,
+      "std": 0.5991950631141663,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 5,
+      "name": "depth_head.resize_layers.0",
+      "type": "ConvTranspose2d",
+      "shape": [
+        1,
+        48,
+        148,
+        148
+      ],
+      "dtype": "torch.float32",
+      "min": -0.3802766799926758,
+      "max": 0.4098063111305237,
+      "mean": 0.004707656800746918,
+      "std": 0.09482813626527786,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 6,
+      "name": "depth_head.resize_layers.1",
+      "type": "ConvTranspose2d",
+      "shape": [
+        1,
+        96,
+        74,
+        74
+      ],
+      "dtype": "torch.float32",
+      "min": -0.7899015545845032,
+      "max": 0.7685991525650024,
+      "mean": -0.0050008115358650684,
+      "std": 0.1705775260925293,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 7,
+      "name": "depth_head.resize_layers.3",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        384,
+        19,
+        19
+      ],
+      "dtype": "torch.float32",
+      "min": -1.7305257320404053,
+      "max": 1.4097052812576294,
+      "mean": 0.004972995258867741,
+      "std": 0.33190295100212097,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 8,
+      "name": "depth_head.scratch.layer1_rn",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        148,
+        148
+      ],
+      "dtype": "torch.float32",
+      "min": -0.27878904342651367,
+      "max": 0.2589815855026245,
+      "mean": -5.0303795433137566e-05,
+      "std": 0.05393050238490105,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 9,
+      "name": "depth_head.scratch.layer2_rn",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        74,
+        74
+      ],
+      "dtype": "torch.float32",
+      "min": -0.39936232566833496,
+      "max": 0.49568018317222595,
+      "mean": -0.0007258763071149588,
+      "std": 0.10089094191789627,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 10,
+      "name": "depth_head.scratch.layer3_rn",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        37,
+        37
+      ],
+      "dtype": "torch.float32",
+      "min": -1.4363034963607788,
+      "max": 1.2605133056640625,
+      "mean": 0.002389216795563698,
+      "std": 0.32576197385787964,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 11,
+      "name": "depth_head.scratch.layer4_rn",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        19,
+        19
+      ],
+      "dtype": "torch.float32",
+      "min": -0.7978261113166809,
+      "max": 0.7513290047645569,
+      "mean": 0.004783594515174627,
+      "std": 0.18685835599899292,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 12,
+      "name": "depth_head.scratch.refinenet1.out_conv",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        296,
+        296
+      ],
+      "dtype": "torch.float32",
+      "min": -0.4133584499359131,
+      "max": 0.45510542392730713,
+      "mean": 0.011330968700349331,
+      "std": 0.1133732721209526,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 13,
+      "name": "depth_head.scratch.refinenet1.resConfUnit1.conv1",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        148,
+        148
+      ],
+      "dtype": "torch.float32",
+      "min": -0.11581635475158691,
+      "max": 0.11131487786769867,
+      "mean": 0.0030661437194794416,
+      "std": 0.030160777270793915,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 14,
+      "name": "depth_head.scratch.refinenet1.resConfUnit1.conv2",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        148,
+        148
+      ],
+      "dtype": "torch.float32",
+      "min": -0.08293002843856812,
+      "max": 0.0714581161737442,
+      "mean": 0.004897458013147116,
+      "std": 0.027133682742714882,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 15,
+      "name": "depth_head.scratch.refinenet1.resConfUnit2.conv1",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        148,
+        148
+      ],
+      "dtype": "torch.float32",
+      "min": -0.3333916962146759,
+      "max": 0.2961910367012024,
+      "mean": 0.004368376452475786,
+      "std": 0.06579068303108215,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 16,
+      "name": "depth_head.scratch.refinenet1.resConfUnit2.conv2",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        148,
+        148
+      ],
+      "dtype": "torch.float32",
+      "min": -0.17715886235237122,
+      "max": 0.20786748826503754,
+      "mean": -0.011956845410168171,
+      "std": 0.045202936977148056,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 17,
+      "name": "depth_head.scratch.refinenet2.out_conv",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        148,
+        148
+      ],
+      "dtype": "torch.float32",
+      "min": -0.5068607330322266,
+      "max": 0.6619017124176025,
+      "mean": 0.004747365135699511,
+      "std": 0.13417351245880127,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 18,
+      "name": "depth_head.scratch.refinenet2.resConfUnit1.conv1",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        74,
+        74
+      ],
+      "dtype": "torch.float32",
+      "min": -0.2253703474998474,
+      "max": 0.23030193150043488,
+      "mean": -0.005047031212598085,
+      "std": 0.05207033082842827,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 19,
+      "name": "depth_head.scratch.refinenet2.resConfUnit1.conv2",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        74,
+        74
+      ],
+      "dtype": "torch.float32",
+      "min": -0.1055321916937828,
+      "max": 0.10154378414154053,
+      "mean": -0.0008222644100897014,
+      "std": 0.030288610607385635,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 20,
+      "name": "depth_head.scratch.refinenet2.resConfUnit2.conv1",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        74,
+        74
+      ],
+      "dtype": "torch.float32",
+      "min": -0.39294326305389404,
+      "max": 0.3785483241081238,
+      "mean": 0.004289367236196995,
+      "std": 0.08894303441047668,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 21,
+      "name": "depth_head.scratch.refinenet2.resConfUnit2.conv2",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        74,
+        74
+      ],
+      "dtype": "torch.float32",
+      "min": -0.15386487543582916,
+      "max": 0.16869062185287476,
+      "mean": 0.0034790965728461742,
+      "std": 0.04106232151389122,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 22,
+      "name": "depth_head.scratch.refinenet3.out_conv",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        74,
+        74
+      ],
+      "dtype": "torch.float32",
+      "min": -0.9243043661117554,
+      "max": 0.9045267105102539,
+      "mean": -0.008610280230641365,
+      "std": 0.19437099993228912,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 23,
+      "name": "depth_head.scratch.refinenet3.resConfUnit1.conv1",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        37,
+        37
+      ],
+      "dtype": "torch.float32",
+      "min": -0.5803011059761047,
+      "max": 0.5274658203125,
+      "mean": -0.007643110118806362,
+      "std": 0.1402503252029419,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 24,
+      "name": "depth_head.scratch.refinenet3.resConfUnit1.conv2",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        37,
+        37
+      ],
+      "dtype": "torch.float32",
+      "min": -0.2589600086212158,
+      "max": 0.22484132647514343,
+      "mean": 0.003539239289239049,
+      "std": 0.05417894572019577,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 25,
+      "name": "depth_head.scratch.refinenet3.resConfUnit2.conv1",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        37,
+        37
+      ],
+      "dtype": "torch.float32",
+      "min": -0.6021057367324829,
+      "max": 0.6849672198295593,
+      "mean": -0.009061646647751331,
+      "std": 0.14718139171600342,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 26,
+      "name": "depth_head.scratch.refinenet3.resConfUnit2.conv2",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        37,
+        37
+      ],
+      "dtype": "torch.float32",
+      "min": -0.2272690385580063,
+      "max": 0.24604199826717377,
+      "mean": 0.01222609356045723,
+      "std": 0.05850213021039963,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 27,
+      "name": "depth_head.scratch.refinenet4.out_conv",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        37,
+        37
+      ],
+      "dtype": "torch.float32",
+      "min": -0.48025089502334595,
+      "max": 0.5448672771453857,
+      "mean": -0.011110750027000904,
+      "std": 0.1262606978416443,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 30,
+      "name": "depth_head.scratch.refinenet4.resConfUnit2.conv1",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        19,
+        19
+      ],
+      "dtype": "torch.float32",
+      "min": -0.30253201723098755,
+      "max": 0.2778225839138031,
+      "mean": -0.015566729009151459,
+      "std": 0.07688168436288834,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 31,
+      "name": "depth_head.scratch.refinenet4.resConfUnit2.conv2",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        64,
+        19,
+        19
+      ],
+      "dtype": "torch.float32",
+      "min": -0.11176789551973343,
+      "max": 0.12201735377311707,
+      "mean": 0.00507351104170084,
+      "std": 0.031350210309028625,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 32,
+      "name": "depth_head.scratch.output_conv1",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        32,
+        296,
+        296
+      ],
+      "dtype": "torch.float32",
+      "min": -0.24257077276706696,
+      "max": 0.1917475312948227,
+      "mean": -0.001020647119730711,
+      "std": 0.05915001779794693,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 33,
+      "name": "depth_head.scratch.output_conv2.0",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        32,
+        518,
+        518
+      ],
+      "dtype": "torch.float32",
+      "min": -0.15279285609722137,
+      "max": 0.1481974869966507,
+      "mean": 0.00041904154932126403,
+      "std": 0.04369040206074715,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 34,
+      "name": "depth_head.scratch.output_conv2.2",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        1,
+        518,
+        518
+      ],
+      "dtype": "torch.float32",
+      "min": -0.0808183029294014,
+      "max": -0.0372823141515255,
+      "mean": -0.053139496594667435,
+      "std": 0.004916725680232048,
+      "sparsity": 0.0
+    }
+  ]
+}

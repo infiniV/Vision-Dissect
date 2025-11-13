@@ -764,6 +764,193 @@ class MobileSAMBenchmark(ModelBenchmark):
         }
 
 
+class GroundingDinoBenchmark(ModelBenchmark):
+    """Grounding DINO - zero-shot object detection with text prompts."""
+
+    MODEL_NAME = "GroundingDino"
+    MODEL_ID = "IDEA-Research/grounding-dino-tiny"
+    INPUT_SIZE = 800
+
+    def __init__(self, device: torch.device):
+        self.device = device
+        self.model = None
+        self.processor = None
+        self.prompt_variations = [
+            [["a car", "a person", "a building", "a tree", "a window", "a door"]],
+            [["a vehicle", "a human", "architecture", "vegetation"]],
+            [["a vintage car", "a person walking", "a wooden door", "a yellow wall"]],
+        ]
+        self.default_prompt = self.prompt_variations[0]
+
+    def load(self):
+        from transformers import AutoProcessor, AutoModelForZeroShotObjectDetection
+
+        print(f"[LOAD] Loading {self.MODEL_NAME} from {self.MODEL_ID}...")
+        self.processor = AutoProcessor.from_pretrained(self.MODEL_ID)
+        self.model = AutoModelForZeroShotObjectDetection.from_pretrained(
+            self.MODEL_ID
+        ).to(self.device)
+        self.model.eval()
+
+    def infer(self, image_path: Path) -> float:
+        image = Image.open(image_path).convert("RGB")
+        inputs = self.processor(
+            images=image, text=self.default_prompt, return_tensors="pt"
+        ).to(self.device)
+
+        if self.device.type == "cuda":
+            torch.cuda.synchronize()
+
+        start = time.time()
+        with torch.no_grad():
+            _ = self.model(**inputs)
+
+        if self.device.type == "cuda":
+            torch.cuda.synchronize()
+
+        return time.time() - start
+
+    def analyze_prompt_variations(self, image_path: Path) -> Dict:
+        image = Image.open(image_path).convert("RGB")
+        results = []
+
+        for idx, text_prompt in enumerate(self.prompt_variations, 1):
+            inputs = self.processor(
+                images=image, text=text_prompt, return_tensors="pt"
+            ).to(self.device)
+
+            if self.device.type == "cuda":
+                torch.cuda.synchronize()
+
+            start = time.time()
+            with torch.no_grad():
+                outputs = self.model(**inputs)
+
+            if self.device.type == "cuda":
+                torch.cuda.synchronize()
+
+            inference_time = time.time() - start
+
+            processed = self.processor.post_process_grounded_object_detection(
+                outputs,
+                inputs.input_ids,
+                threshold=0.3,
+                text_threshold=0.25,
+                target_sizes=[image.size[::-1]],
+            )
+
+            detection_count = len(processed[0]["boxes"])
+
+            results.append(
+                {
+                    "prompt_idx": idx,
+                    "prompt": ", ".join(text_prompt[0]),
+                    "inference_time_sec": inference_time,
+                    "detections": detection_count,
+                }
+            )
+
+        return {"prompt_variations": results}
+
+    def dissect_layers(self, image_path: Path, viz_dir: Path) -> Dict:
+        image = Image.open(image_path).convert("RGB")
+        inputs = self.processor(
+            images=image, text=self.default_prompt, return_tensors="pt"
+        ).to(self.device)
+
+        all_layers = []
+        for name, module in self.model.named_modules():
+            if len(list(module.children())) > 0:
+                continue
+
+            module_type = type(module).__name__
+
+            if "conv" in module_type.lower():
+                all_layers.append((name, module))
+            elif "multiscaledeformableattention" in module_type.lower():
+                all_layers.append((name, module))
+
+        layers_metadata = []
+        dissect_start = time.time()
+
+        print(
+            f"[DISSECT] Processing {len(all_layers)} key layers (Conv + DeformableAttention)..."
+        )
+
+        for idx, (layer_name, layer_module) in enumerate(all_layers):
+            activation = {}
+
+            def hook(module, input, output):
+                if torch.is_tensor(output):
+                    activation["data"] = output.detach().cpu()
+                elif isinstance(output, (tuple, list)) and len(output) > 0:
+                    if torch.is_tensor(output[0]):
+                        activation["data"] = output[0].detach().cpu()
+
+            handle = layer_module.register_forward_hook(hook)
+
+            with torch.no_grad():
+                try:
+                    _ = self.model(**inputs)
+                except:
+                    pass
+
+            handle.remove()
+
+            if "data" in activation and activation["data"] is not None:
+                tensor = activation["data"]
+
+                layer_info = {
+                    "idx": idx,
+                    "name": layer_name,
+                    "type": type(layer_module).__name__,
+                    "shape": list(tensor.shape),
+                    "dtype": str(tensor.dtype),
+                    "min": safe_float(tensor.min()),
+                    "max": safe_float(tensor.max()),
+                    "mean": safe_float(tensor.mean()),
+                    "std": safe_float(tensor.std()),
+                    "sparsity": safe_float((tensor == 0).float().mean()),
+                }
+                layers_metadata.append(layer_info)
+
+                if tensor.dim() == 4 and tensor.shape[1] > 0:
+                    save_feature_map_png(tensor, viz_dir / f"layer_{idx:03d}.png")
+                    save_feature_map_npy(tensor, viz_dir / f"layer_{idx:03d}.npy")
+
+                if (idx + 1) % 20 == 0 or idx == len(all_layers) - 1:
+                    elapsed = time.time() - dissect_start
+                    print(
+                        f"[DISSECT] {idx+1}/{len(all_layers)} layers | Elapsed: {elapsed:.1f}s | {datetime.now().strftime('%H:%M:%S')}"
+                    )
+
+                del tensor
+                del activation
+                if self.device.type == "cuda":
+                    torch.cuda.empty_cache()
+
+        return {"layers": layers_metadata}
+
+    def cleanup(self):
+        del self.model
+        del self.processor
+        self.model = None
+        self.processor = None
+
+        if self.device.type == "cuda":
+            torch.cuda.empty_cache()
+        gc.collect()
+
+    def get_info(self) -> Dict:
+        total_params = sum(p.numel() for p in self.model.parameters())
+        return {
+            "model_name": self.MODEL_NAME,
+            "input_size": self.INPUT_SIZE,
+            "total_params": total_params,
+            "device": str(self.device),
+        }
+
+
 def generate_reports(
     results: List[Dict],
     timestamp: str,
@@ -807,6 +994,7 @@ def generate_reports(
                 "mem_peak_mb",
                 "total_params",
                 "total_layers_dissected",
+                "has_prompt_variations",
                 "num_images",
                 "num_runs_per_image",
                 "device",
@@ -814,11 +1002,11 @@ def generate_reports(
         )
         writer.writeheader()
         for result in results:
-            writer.writerow({k: result[k] for k in writer.fieldnames})
+            writer.writerow({k: result.get(k, False) for k in writer.fieldnames})
 
     # Markdown - Readable report
     md_path = results_dir / f"benchmark_report_{timestamp}.md"
-    with open(md_path, "w") as f:
+    with open(md_path, "w", encoding="utf-8") as f:
         f.write(f"# Vision Model Benchmark Report\n\n")
         f.write(f"**Timestamp:** {timestamp}\n\n")
 
@@ -848,17 +1036,18 @@ def generate_reports(
         # Results table
         f.write(f"## Results\n\n")
         f.write(
-            f"| Model | Load Time (s) | Avg Inference (s) | Std (s) | FPS | Peak Memory (MB) | Parameters | Layers |\n"
+            f"| Model | Load Time (s) | Avg Inference (s) | Std (s) | FPS | Peak Memory (MB) | Parameters | Layers | Zero-Shot |\n"
         )
         f.write(
-            f"|-------|---------------|-------------------|---------|-----|------------------|------------|--------|\n"
+            f"|-------|---------------|-------------------|---------|-----|------------------|------------|--------|----------|\n"
         )
         for r in results:
+            zero_shot_marker = "✓" if r.get("has_prompt_variations", False) else ""
             f.write(
                 f"| {r['model_name']} | {r['load_time_sec']:.2f} | "
                 f"{r['avg_inference_sec']:.3f} | {r['std_inference_sec']:.3f} | "
                 f"{r['fps_avg']:.2f} | {r['mem_peak_mb']:.0f} | "
-                f"{r['total_params']:,} | {r['total_layers_dissected']} |\n"
+                f"{r['total_params']:,} | {r['total_layers_dissected']} | {zero_shot_marker} |\n"
             )
 
         # Analysis
@@ -881,6 +1070,21 @@ def generate_reports(
         f.write(
             f"- **Most Parameters:** {most_params['model_name']} ({most_params['total_params']:,})\n\n"
         )
+
+        # Prompt variation analysis
+        prompt_models = [r for r in results if r.get("has_prompt_variations", False)]
+        if prompt_models:
+            f.write(f"## Prompt Variation Analysis\n\n")
+            for r in prompt_models:
+                f.write(f"### {r['model_name']}\n\n")
+                if "prompt_variations" in r:
+                    f.write(f"| Prompt | Inference Time (s) | Detections |\n")
+                    f.write(f"|--------|-------------------|------------|\n")
+                    for pv in r["prompt_variations"]:
+                        f.write(
+                            f"| {pv['prompt']} | {pv['inference_time_sec']:.3f} | {pv['detections']} |\n"
+                        )
+                    f.write(f"\n")
 
         # Visualization links
         f.write(f"## Visualizations\n\n")
@@ -953,9 +1157,9 @@ def run_benchmark():
     viz_dir = Path(f"vision-bench/viz/{timestamp}")
     viz_dir.mkdir(parents=True, exist_ok=True)
 
-    # Benchmark classes ordered from smallest to largest
+    # Benchmark classes - GroundingDino first for fast testing
     benchmark_classes = [
-        DepthProBenchmark,  # ~1.3B params
+        GroundingDinoBenchmark,  # ~172M params
         YOLO11nDetectBenchmark,  # ~3M params
         YOLO11nSegmentBenchmark,  # ~3M params
         YOLO11nPoseBenchmark,  # ~3M params
@@ -963,6 +1167,7 @@ def run_benchmark():
         DepthAnythingV2SmallBenchmark,  # ~24M params
         DepthAnythingV2BaseBenchmark,  # ~97M params
         DepthAnythingV2LargeBenchmark,  # ~335M params
+        DepthProBenchmark,  # ~1.3B params
     ]
 
     all_results = []
@@ -1053,6 +1258,19 @@ def run_benchmark():
 
             print(f"[DISSECT] Saved {len(layer_info['layers'])} layer visualizations")
 
+            # Prompt variation analysis for Grounding DINO
+            prompt_variation_data = None
+            if isinstance(benchmark, GroundingDinoBenchmark):
+                print(f"[PROMPT] Analyzing prompt variations...")
+                prompt_variation_data = benchmark.analyze_prompt_variations(
+                    test_images[0]
+                )
+                print(f"[PROMPT] Tested {len(prompt_variation_data['prompt_variations'])} prompt variations")
+                for pv in prompt_variation_data["prompt_variations"]:
+                    print(
+                        f"[PROMPT]   Prompt {pv['prompt_idx']}: {pv['inference_time_sec']:.3f}s | {pv['detections']} detections"
+                    )
+
             # Cleanup
             print(f"[CLEANUP] Clearing model and cache...")
             benchmark.cleanup()
@@ -1083,6 +1301,13 @@ def run_benchmark():
                 "input_size": BenchmarkClass.INPUT_SIZE,
                 "device": str(device),
             }
+
+            if prompt_variation_data:
+                result["prompt_variations"] = prompt_variation_data["prompt_variations"]
+                result["has_prompt_variations"] = True
+            else:
+                result["has_prompt_variations"] = False
+
             all_results.append(result)
 
             print(f"[COMPLETE] {BenchmarkClass.MODEL_NAME} finished")

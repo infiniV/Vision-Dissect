@@ -1,0 +1,281 @@
+{
+  "layers": [
+    {
+      "idx": 0,
+      "name": "model.backbone.conv_encoder.model.embeddings.patch_embeddings.projection",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        96,
+        200,
+        267
+      ],
+      "dtype": "torch.float32",
+      "min": -2.92014741897583,
+      "max": 2.4153566360473633,
+      "mean": -0.003957475535571575,
+      "std": 0.2804166078567505,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 1,
+      "name": "model.input_proj_vision.0.0",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        256,
+        100,
+        134
+      ],
+      "dtype": "torch.float32",
+      "min": -12.589489936828613,
+      "max": 11.609375,
+      "mean": -0.041116613894701004,
+      "std": 2.045823097229004,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 2,
+      "name": "model.input_proj_vision.1.0",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        256,
+        50,
+        67
+      ],
+      "dtype": "torch.float32",
+      "min": -16.575336456298828,
+      "max": 17.144418716430664,
+      "mean": 0.04176591709256172,
+      "std": 3.2186954021453857,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 3,
+      "name": "model.input_proj_vision.2.0",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        256,
+        25,
+        34
+      ],
+      "dtype": "torch.float32",
+      "min": -27.730562210083008,
+      "max": 25.96038246154785,
+      "mean": -0.047384411096572876,
+      "std": 5.861429214477539,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 4,
+      "name": "model.input_proj_vision.3.0",
+      "type": "Conv2d",
+      "shape": [
+        1,
+        256,
+        13,
+        17
+      ],
+      "dtype": "torch.float32",
+      "min": -134.26852416992188,
+      "max": 132.13446044921875,
+      "mean": 0.4512617588043213,
+      "std": 30.269691467285156,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 5,
+      "name": "model.encoder.layers.0.deformable_layer.self_attn.attn",
+      "type": "MultiScaleDeformableAttention",
+      "shape": [
+        1,
+        17821,
+        256
+      ],
+      "dtype": "torch.float32",
+      "min": -3.1886627674102783,
+      "max": 3.629197597503662,
+      "mean": 0.0015915663680061698,
+      "std": 0.17005357146263123,
+      "sparsity": 2.191936516737769e-07
+    },
+    {
+      "idx": 6,
+      "name": "model.encoder.layers.1.deformable_layer.self_attn.attn",
+      "type": "MultiScaleDeformableAttention",
+      "shape": [
+        1,
+        17821,
+        256
+      ],
+      "dtype": "torch.float32",
+      "min": -1.8153631687164307,
+      "max": 1.6064200401306152,
+      "mean": -0.0020499066449701786,
+      "std": 0.11623520404100418,
+      "sparsity": 0.00042085180757567286
+    },
+    {
+      "idx": 7,
+      "name": "model.encoder.layers.2.deformable_layer.self_attn.attn",
+      "type": "MultiScaleDeformableAttention",
+      "shape": [
+        1,
+        17821,
+        256
+      ],
+      "dtype": "torch.float32",
+      "min": -2.274270534515381,
+      "max": 3.0244545936584473,
+      "mean": -0.016689829528331757,
+      "std": 0.26236966252326965,
+      "sparsity": 0.0011082431301474571
+    },
+    {
+      "idx": 8,
+      "name": "model.encoder.layers.3.deformable_layer.self_attn.attn",
+      "type": "MultiScaleDeformableAttention",
+      "shape": [
+        1,
+        17821,
+        256
+      ],
+      "dtype": "torch.float32",
+      "min": -2.8743624687194824,
+      "max": 2.389479398727417,
+      "mean": 0.0002645555359777063,
+      "std": 0.22440475225448608,
+      "sparsity": 0.0008136468240991235
+    },
+    {
+      "idx": 9,
+      "name": "model.encoder.layers.4.deformable_layer.self_attn.attn",
+      "type": "MultiScaleDeformableAttention",
+      "shape": [
+        1,
+        17821,
+        256
+      ],
+      "dtype": "torch.float32",
+      "min": -2.209620714187622,
+      "max": 2.5687174797058105,
+      "mean": 0.004789269529283047,
+      "std": 0.24855606257915497,
+      "sparsity": 0.0005611357628367841
+    },
+    {
+      "idx": 10,
+      "name": "model.encoder.layers.5.deformable_layer.self_attn.attn",
+      "type": "MultiScaleDeformableAttention",
+      "shape": [
+        1,
+        17821,
+        256
+      ],
+      "dtype": "torch.float32",
+      "min": -2.8734025955200195,
+      "max": 3.044060230255127,
+      "mean": 0.007469720672816038,
+      "std": 0.3015216290950775,
+      "sparsity": 0.0004559227963909507
+    },
+    {
+      "idx": 11,
+      "name": "model.decoder.layers.0.encoder_attn.attn",
+      "type": "MultiScaleDeformableAttention",
+      "shape": [
+        1,
+        900,
+        256
+      ],
+      "dtype": "torch.float32",
+      "min": -1.2600237131118774,
+      "max": 1.000818133354187,
+      "mean": -0.002364818938076496,
+      "std": 0.20634253323078156,
+      "sparsity": 0.00013888889225199819
+    },
+    {
+      "idx": 12,
+      "name": "model.decoder.layers.1.encoder_attn.attn",
+      "type": "MultiScaleDeformableAttention",
+      "shape": [
+        1,
+        900,
+        256
+      ],
+      "dtype": "torch.float32",
+      "min": -0.983402669429779,
+      "max": 0.9798495173454285,
+      "mean": -0.006690086331218481,
+      "std": 0.16000381112098694,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 13,
+      "name": "model.decoder.layers.2.encoder_attn.attn",
+      "type": "MultiScaleDeformableAttention",
+      "shape": [
+        1,
+        900,
+        256
+      ],
+      "dtype": "torch.float32",
+      "min": -0.869805634021759,
+      "max": 0.8291299343109131,
+      "mean": 0.004421632271260023,
+      "std": 0.13859719038009644,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 14,
+      "name": "model.decoder.layers.3.encoder_attn.attn",
+      "type": "MultiScaleDeformableAttention",
+      "shape": [
+        1,
+        900,
+        256
+      ],
+      "dtype": "torch.float32",
+      "min": -0.8759210109710693,
+      "max": 0.665032148361206,
+      "mean": -0.006350252777338028,
+      "std": 0.11776228994131088,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 15,
+      "name": "model.decoder.layers.4.encoder_attn.attn",
+      "type": "MultiScaleDeformableAttention",
+      "shape": [
+        1,
+        900,
+        256
+      ],
+      "dtype": "torch.float32",
+      "min": -0.9445735216140747,
+      "max": 0.8592793345451355,
+      "mean": -0.0036042598076164722,
+      "std": 0.1069408506155014,
+      "sparsity": 0.0
+    },
+    {
+      "idx": 16,
+      "name": "model.decoder.layers.5.encoder_attn.attn",
+      "type": "MultiScaleDeformableAttention",
+      "shape": [
+        1,
+        900,
+        256
+      ],
+      "dtype": "torch.float32",
+      "min": -0.7386266589164734,
+      "max": 0.8872119784355164,
+      "mean": -0.00694155041128397,
+      "std": 0.10139190405607224,
+      "sparsity": 0.0
+    }
+  ]
+}
