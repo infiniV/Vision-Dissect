@@ -15,7 +15,7 @@ class ONNXDepthHead(nn.Module):
     """
     Depth prediction using DepthAnythingV2-Small ONNX model
     """
-    def __init__(self, model_path="models/depth_anything_v2_vits.onnx"):
+    def __init__(self, model_path="../models/depth_anything_v2_vits.onnx"):
         super().__init__()
 
         print(f"Loading DepthAnything ONNX model from {model_path}...")
@@ -96,7 +96,7 @@ class ONNXSegmentationHead(nn.Module):
     """
     Segmentation using YOLO11n-Seg ONNX model
     """
-    def __init__(self, model_path="models/yolo11n-seg.onnx"):
+    def __init__(self, model_path="../models/yolo11n-seg.onnx"):
         super().__init__()
 
         print(f"Loading YOLO11n-Seg ONNX model from {model_path}...")
@@ -164,7 +164,7 @@ class ONNXKeypointsHead(nn.Module):
     """
     Keypoints prediction using YOLO11n-Pose ONNX model
     """
-    def __init__(self, model_path="models/yolo11n-pose.onnx"):
+    def __init__(self, model_path="../models/yolo11n-pose.onnx"):
         super().__init__()
 
         print(f"Loading YOLO11n-Pose ONNX model from {model_path}...")

@@ -7,10 +7,10 @@ import numpy as np
 import torch
 import time
 import argparse
-from clabsi_guard import CLABSIGuard
-from clabsi_guard_v2 import CLABSIGuardV2
-from pretrained_heads import PretrainedDepthHead, PretrainedSegmentationHead, PretrainedKeypointsHead
-from monitor import ComplianceMonitor, ViolationType
+from src.clabsi_guard import CLABSIGuard
+from src.clabsi_guard_v2 import CLABSIGuardV2
+from heads.pretrained_heads import PretrainedDepthHead, PretrainedSegmentationHead, PretrainedKeypointsHead
+from src.monitor import ComplianceMonitor, ViolationType
 
 
 class WebcamDemo:

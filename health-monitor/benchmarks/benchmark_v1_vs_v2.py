@@ -5,8 +5,8 @@ Compare performance, parameters, and inference speed
 import torch
 import time
 import numpy as np
-from clabsi_guard import CLABSIGuard
-from clabsi_guard_v2 import CLABSIGuardV2
+from src.clabsi_guard import CLABSIGuard
+from src.clabsi_guard_v2 import CLABSIGuardV2
 
 
 def benchmark_model(model, model_name, num_runs=100):

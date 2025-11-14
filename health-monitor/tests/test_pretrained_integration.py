@@ -1,6 +1,6 @@
 """Quick test to verify pretrained heads integration"""
 import numpy as np
-from pretrained_heads import PretrainedDepthHead, PretrainedSegmentationHead, PretrainedKeypointsHead
+from heads.pretrained_heads import PretrainedDepthHead, PretrainedSegmentationHead, PretrainedKeypointsHead
 
 print("Testing pretrained heads integration...")
 

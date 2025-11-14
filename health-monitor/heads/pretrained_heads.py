@@ -12,7 +12,7 @@ import sys
 import os
 
 # Add path for depth_anything_v2
-vision_bench_path = os.path.join(os.path.dirname(__file__), '..', 'vision-bench')
+vision_bench_path = os.path.join(os.path.dirname(__file__), '..', '..', 'vision-bench')
 sys.path.insert(0, vision_bench_path)
 
 

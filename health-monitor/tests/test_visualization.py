@@ -4,8 +4,8 @@ Test visualization functions without launching full webcam demo
 import cv2
 import torch
 import numpy as np
-from clabsi_guard import CLABSIGuard
-from monitor import ComplianceMonitor
+from src.clabsi_guard import CLABSIGuard
+from src.monitor import ComplianceMonitor
 
 
 def test_visualization():

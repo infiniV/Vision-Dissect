@@ -1,7 +1,7 @@
 """Visual test of all model outputs"""
 import cv2
 import numpy as np
-from pretrained_heads import PretrainedDepthHead, PretrainedSegmentationHead, PretrainedKeypointsHead
+from heads.pretrained_heads import PretrainedDepthHead, PretrainedSegmentationHead, PretrainedKeypointsHead
 
 print("Loading models...")
 depth_head = PretrainedDepthHead()

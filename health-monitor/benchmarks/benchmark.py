@@ -2,8 +2,8 @@
 Benchmark CLABSIGuard model performance
 """
 import torch
-from clabsi_guard import CLABSIGuard
-from utils import benchmark_model, print_model_summary
+from src.clabsi_guard import CLABSIGuard
+from src.utils import benchmark_model, print_model_summary
 
 
 def main():

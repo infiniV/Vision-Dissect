@@ -5,14 +5,9 @@ Maintains TEO-1 architecture: pretrained backbone + tiny heads
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import sys
-import os
 
-# Add backbones to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'backbones'))
-
-from yolo_backbone import YOLOBackbone
-from feature_adapter import FeatureAdapter
+from backbones.yolo_backbone import YOLOBackbone
+from backbones.feature_adapter import FeatureAdapter
 
 
 class TinyDetectionHead(nn.Module):

@@ -5,7 +5,7 @@ import time
 import torch
 import cv2
 import numpy as np
-from clabsi_guard import CLABSIGuard
+from src.clabsi_guard import CLABSIGuard
 
 
 def test_fps_lock():
